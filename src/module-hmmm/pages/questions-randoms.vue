@@ -1,5 +1,5 @@
 <template>
-  <div class='container'>精选题库</div>
+  <div class='container question-container'>组题列表</div>
 </template>
 
 <script>
