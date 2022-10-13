@@ -6,8 +6,8 @@
       :current-page="Number(paginationPage)"
       :total="Number(total)"
       :page-size="Number(paginationPagesize)"
-      :page-sizes="[10,20,30, 50]"
-      layout="sizes, prev, pager, next, jumper"
+      :page-sizes="[2,3,5, 10]"
+      layout="prev, pager, next, sizes,jumper"
       >
       </el-pagination>
   </div>
@@ -34,4 +34,8 @@ export default {
 </script>
 <style>
 .blue{color: #409EFF;}
+.pages {
+  margin-top: 20px;
+  text-align: right;
+}
 </style>

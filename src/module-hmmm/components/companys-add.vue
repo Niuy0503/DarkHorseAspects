@@ -17,10 +17,10 @@
           <el-input v-model="formBase.company"></el-input>
           <p>https://www.tianyancha.com （在此可查询所属公司全称及简称）</p>
         </el-form-item>
-        <el-form-item label="城市" prop="province">
+        <el-form-item label="城市地区" prop="province">
           <el-select
             class="filter-item"
-            style="width: 130px;"
+            style="width: 48%; margin-right: 4%"
             v-model="formBase.province"
             @keyup.enter="handleFilter"
             @change="handleProvince"
@@ -30,7 +30,7 @@
           </el-select>
           <el-select
             class="filter-item"
-            style="width: 130px;"
+            style="width: 48%;"
             v-model="formBase.city"
             @keyup.enter="handleFilter"
             filterable
@@ -58,7 +58,7 @@
   </div>
 </template>
 <script>
-import { update, add } from '@/api/base/users'
+import { add, update } from '@/api/hmmm/companys'
 import { provinces, citys } from '@/api/hmmm/citys.js'
 export default {
   name: 'CompanysAdd',
