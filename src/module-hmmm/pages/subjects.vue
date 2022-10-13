@@ -5,22 +5,25 @@
         <el-col :span="18">
           <el-form :inline="true"  class="demo-form-inline">
             <el-form-item label="学科名称">
-            <el-input placeholder="请输入"></el-input>
+            <el-input type="text"
+              placeholder="请输入内容"
+              v-model="keywords">
+              </el-input>
             </el-form-item>
             <el-form-item>
-            <el-button plain>清除</el-button>
+            <el-button plain @click="keywords = ''">清除</el-button>
             </el-form-item>
             <el-form-item>
-            <el-button type="primary">搜索</el-button>
+            <el-button type="primary" @click="getSubjectDetails">搜索</el-button>
             </el-form-item>
           </el-form>
         </el-col>
         <el-col :span="6" style="text-align:right">
-          <el-button type="success" icon="el-icon-edit">新增学科</el-button>
+          <el-button type="success" icon="el-icon-edit" @click="addSubjects">新增学科</el-button>
         </el-col>
       </el-row>
        <el-alert
-       title="数据一共16条"
+       :title="`数据一共${counts}条`"
        type="info"
        show-icon
        :closable="false"
@@ -55,7 +58,8 @@
     <el-table-column
       prop="isFrontDisplay"
       label="前台是否显示"
-      width="140">
+      width="140"
+      :formatter="formatterFn">
     </el-table-column>
     <el-table-column
       prop="twoLevelDirectory"
@@ -76,10 +80,12 @@
       prop="address"
       label="操作"
       width="240">
-      <el-button type="text">学科分类</el-button>
-      <el-button type="text">学科标签</el-button>
-      <el-button type="text">修改</el-button>
-      <el-button type="text">删除</el-button>
+      <template slot-scope="{row}">
+        <el-button type="text">学科分类</el-button>
+        <el-button type="text">学科标签</el-button>
+        <el-button type="text" @click="editSubject(row)">修改</el-button>
+        <el-button type="text" @click="delSubject(row)">删除</el-button>
+        </template>
     </el-table-column>
     </el-table>
     <PageTool :total="counts"
@@ -89,21 +95,36 @@
     @pageSizeChange="changePageSize">
     </PageTool>
     </el-card>
+    <subjects-add ref="addSubject" :dialogVisible.sync="dialogVisible" @refreshList="getSubjectDetails"></subjects-add>
   </div>
 </template>
 
 <script>
-import { list } from '@/api/hmmm/subjects.js'
+import { list, remove } from '@/api/hmmm/subjects.js'
 import PageTool from '../components/pageTool.vue'
+import SubjectsAdd from '../components/subjects-add.vue'
 export default {
-  components: { PageTool },
+  name: 'subjects',
+  components: { PageTool, SubjectsAdd },
   data () {
     return {
+      keywords: '', // 搜索框内容
       page: 1, // 当前页
       pagesize: 10, // 页面大小
       pages: 1, // 总页数
       counts: 0, // 总记录数
-      list: [] // 学科列表
+      list: [], // 学科列表
+      FrontDisplay: [
+        {
+          id: 0,
+          value: '否'
+        },
+        {
+          id: 1,
+          value: '是'
+        }
+      ],
+      dialogVisible: false
     }
   },
   created () {
@@ -115,14 +136,43 @@ export default {
       try {
         const { data } = await list({
           page: this.page,
-          pagesize: this.pagesize
+          pagesize: this.pagesize,
+          subjectName: this.keywords
         })
-        console.log(data)
         this.page = data.page
         this.pagesize = data.pagesize
         this.pages = data.pages
         this.counts = data.counts
         this.list = data.items
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    formatterFn (row, column, cellValue) {
+      const res = this.FrontDisplay.find(ele => ele.id === cellValue)
+      return res ? res.value : ''
+    },
+    // 新增学科
+    addSubjects () {
+      this.dialogVisible = true
+    },
+    // 修改学科
+    editSubject (row) {
+      this.$refs.addSubject.formDate = { ...row }
+      // 打开弹窗
+      this.dialogVisible = true
+    },
+    // 删除学科
+    async delSubject (row) {
+      try {
+        await this.$confirm('你确定永久删除该学科信息吗？', '提示', {
+          type: 'warning'
+        })
+        // 调用删除接口
+        await remove(row)
+        this.$message.success('删除成功')
+        // 刷新页面
+        this.getSubjectDetails()
       } catch (error) {
         console.log(error)
       }
@@ -171,6 +221,10 @@ export default {
 }
 :deep(.el-table th) {
     background-color: #fafafa;
+}
+.pages{
+  margin-top: 20px;
+  text-align: right;
 }
 }
 </style>
