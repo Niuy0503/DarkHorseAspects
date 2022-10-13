@@ -27,7 +27,7 @@
          <el-button type="primary" v-loading="loading" @click="submit">确 定</el-button>
       </el-form-item>
     </el-form>
-</el-dialog>
+    </el-dialog>
   </div>
 </template>
 
