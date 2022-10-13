@@ -67,15 +67,15 @@ export const direction = [
 export const chkType = [
   {
     value: 1,
-    label: '待审核'
-  },
-  {
-    value: 2,
     label: '通过'
   },
   {
-    value: 3,
+    value: 2,
     label: '拒绝'
+  },
+  {
+    value: 0,
+    label: '待审核'
   }
 ]
 
@@ -83,14 +83,14 @@ export const chkType = [
 export const publishType = [
   {
     value: 1,
+    label: '已发布'
+  },
+  {
+    value: 0,
     label: '待发布'
   },
   {
     value: 2,
-    label: '已发布'
-  },
-  {
-    value: 3,
     label: '已下架'
   }
 ]

@@ -4,13 +4,16 @@
     :title="`数据一共${counts}条`"
     type="info"
     :closable="false"
+    style="margin-bottom: 15px;"
     show-icon>
   </el-alert>
   <!-- 表格主体 -->
   <el-table
       :data="tableData"
+      style="width: 100%"
       :height="height"
-      style="width: 100%">
+      v-loading="loading"
+      >
       <el-table-column
       v-for="(item,index) in tableColumnList" :key="index"
         :prop="item.prop"
@@ -21,12 +24,12 @@
         </template>
       </el-table-column>
       <!-- 操作列 -->
-      <el-table-column v-if="isShowOperation" :label="OperationArea" :width="OperationAreaWidth">
+      <el-table-column v-if="isShowOperation" :label="OperationArea" :width="OperationAreaWidth" :fixed="fixed" :header-align="OperationAreaHeaderAlign">
         <template slot-scope="scope">
           <slot name="OperationColumn" :row="scope.row" />
         </template>
       </el-table-column>
-    </el-table>
+  </el-table>
   </div>
 </template>
 
@@ -68,7 +71,7 @@ export default {
     },
     OperationAreaWidth: {
       type: String,
-      default: '100'
+      default: '180'
     },
     isShowOperation: {
       type: Boolean,
@@ -77,6 +80,14 @@ export default {
     columnIndex: {
       type: [String, Number],
       default: null
+    },
+    fixed: {
+      type: [String, Boolean],
+      default: false
+    },
+    OperationAreaHeaderAlign: {
+      type: String,
+      default: 'left'
     },
     // ----------------------分页组件配置项------------------------
     totalCount: {

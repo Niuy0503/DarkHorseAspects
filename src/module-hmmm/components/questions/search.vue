@@ -83,7 +83,7 @@
     <el-col :span="6">
       <!-- 城市 -->
       <el-form-item label="城市" prop="province">
-        <el-select placeholder="请选择" size="small" style="width:50%;margin-right: 2%;" v-model="formData.province">
+        <el-select placeholder="请选择" size="small" style="width:50%;margin-right: 2%;" v-model="formData.province" @change="formData.city = ''">
           <el-option v-for="item in provincesList" :key="item" :label="item" :value="item">
           </el-option>
         </el-select>
@@ -108,7 +108,6 @@ import { simple } from '@/api/hmmm/subjects'
 import { simple as getDirectorysList } from '@/api/hmmm/directorys'
 import { simple as getTagsList } from '@/api/hmmm/tags'
 import { simple as getCreatorList } from '@/api/base/users'
-import { list as getQuestionsList } from '@/api/hmmm/questions'
 import { questionType, difficulty, direction } from '@/api/hmmm/constants'
 import { provinces, citys } from '@/api/hmmm/citys'
 export default {
@@ -123,18 +122,18 @@ export default {
       difficultyList: difficulty,
       directionList: direction,
       formData: {
-        subjectID: '',
-        catalogID: '',
-        tags: '',
-        keyword: '',
-        questionType: '',
-        difficulty: '',
-        direction: '',
-        creatorID: '',
-        remarks: '',
-        shortName: '',
-        province: '',
-        city: ''
+        subjectID: null,
+        catalogID: null,
+        tags: null,
+        keyword: null,
+        questionType: null,
+        difficulty: null,
+        direction: null,
+        creatorID: null,
+        remarks: null,
+        shortName: null,
+        province: null,
+        city: null
       }
     }
   },
@@ -165,12 +164,12 @@ export default {
       const { data } = await getCreatorList()
       this.creatorList = data
     },
-    async getQuestionsList () {
-      const { data } = await getQuestionsList(this.formData)
-      console.log(data)
+    getQuestionsList () {
+      this.$emit('handleTableData', this.formData)
     },
     clearForm () {
       this.$refs.form.resetFields()
+      this.formData.city = ''
     }
   }
 }
@@ -179,5 +178,8 @@ export default {
 <style lang="less" scoped>
   .el-col-6{
     height: 50px;
+  }
+  .el-select{
+    width: 100%;
   }
 </style>

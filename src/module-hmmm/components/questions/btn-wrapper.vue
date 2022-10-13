@@ -11,6 +11,7 @@ export default {
   methods: {
     addQuestions () {
       console.log('跳转试题录入，可能需要参数区分精选和基础')
+      this.$router.push('/questions/new')
     }
   }
 }
