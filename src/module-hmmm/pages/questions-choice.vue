@@ -6,7 +6,7 @@
       <!-- 搜素表单区域 -->
       <Search @handleTableData="handleTableData"></Search>
       <!-- tab栏切换 -->
-      <el-tabs v-model="activeName" type="card">
+      <el-tabs v-model="activeName" type="card" @tab-click="getChoiceList">
         <el-tab-pane label="全部" name="first"></el-tab-pane>
         <el-tab-pane label="待审核" name="second"></el-tab-pane>
         <el-tab-pane label="已审核" name="third"></el-tab-pane>
@@ -14,13 +14,13 @@
       </el-tabs>
       <!-- 表格部分-->
       <QuestionsTable :tableColumnList="tableColumnList" :counts="counts" :tableData="tableData" :loading="loading" :fixed="'right'" :OperationAreaHeaderAlign="'center'" :OperationAreaWidth="'200'">
-      <template #OperationColumn="{row}" >
-        <el-button type="text" size="small">预览</el-button>
-        <el-button type="text" size="small" :disabled="row.chkState==='通过'">审核</el-button>
-        <el-button type="text" size="small" :disabled="(row.chkState==='拒绝')||row.publishState==='已发布'">修改</el-button>
-        <el-button type="text" size="small">{{row.publishState==='已发布'?'下架':'上架'}}</el-button>
-        <el-button type="text" size="small" :disabled="(row.chkState==='拒绝')||row.publishState==='已发布'">删除</el-button>
-      </template>
+        <template #OperationColumn="{row}" >
+          <el-button type="text" size="small" @click="checkQuestion(row)">预览</el-button>
+          <el-button type="text" size="small" :disabled="row.chkState==='通过'||row.chkState==='拒绝'" @click="showAudit(row)">审核</el-button>
+          <el-button type="text" size="small" :disabled="row.publishState==='已发布'" @click="edit">修改</el-button>
+          <el-button type="text" size="small" @click="changePublishState(row)">{{row.publishState==='已发布'?'下架':'上架'}}</el-button>
+          <el-button type="text" size="small" :disabled="row.publishState==='已发布'">删除</el-button>
+        </template>
       </QuestionsTable>
       <!-- 分页组件 -->
       <el-pagination
@@ -35,6 +35,12 @@
         :total="counts">
       </el-pagination>
     </el-card>
+    <!-- 试题预览 -->
+    <el-dialog title="题目预览" :visible="isShowQuestion" width="900px" @close="isShowQuestion=false">
+      <QuestionsPreview :handeldata="handelData" v-if="isShowQuestion"></QuestionsPreview>
+    </el-dialog>
+    <!-- 试题审核 -->
+    <Audit :isShowAudit="isShowAudit" @closeAudit="closeAudit" @choiceCheck="audit"></Audit>
   </div>
 </template>
 
@@ -42,13 +48,17 @@
 import BtnWrapper from '../components/questions/btn-wrapper.vue'
 import Search from '../components/questions/search.vue'
 import QuestionsTable from '../components/questions/questions-table.vue'
-import { choice as getChoiceList } from '@/api/hmmm/questions'
+import Audit from '../components/questions/audit.vue'
+import { choice as getChoiceList, choiceCheck, choicePublish } from '@/api/hmmm/questions'
 import { formatData } from '@/utils/formatData'
+import QuestionsPreview from '../components/questions-preview.vue'
 export default {
-  components: { BtnWrapper, Search, QuestionsTable },
+  components: { BtnWrapper, Search, QuestionsTable, QuestionsPreview, Audit },
   name: 'questionsChoice',
   data () {
     return {
+      isShowQuestion: false,
+      isShowAudit: false,
       activeName: 'first',
       page: {
         page: 1,
@@ -71,7 +81,9 @@ export default {
         { label: '发布状态', width: 150, prop: 'publishState' }
       ],
       tableData: [],
-      loading: false
+      handelData: {},
+      loading: false,
+      auditId: ''
     }
   },
   created () {
@@ -83,7 +95,7 @@ export default {
       this.getChoiceList()
     },
     async getChoiceList () {
-      const { data } = await getChoiceList({ ...this.page, ...this.searchFormData })
+      const { data } = await getChoiceList({ ...this.page, ...this.searchFormData, chkState: this.chkState })
       console.log(data)
       this.counts = data.counts
       this.tableData = formatData(data.items)
@@ -91,6 +103,55 @@ export default {
         this.page.page--
         this.getChoiceList()
       }
+    },
+    checkQuestion (row) {
+      console.log(row)
+      this.handelData = row
+      this.isShowQuestion = true
+    },
+    // 审核
+    async audit (data) {
+      try {
+        this.isShowAudit = false
+        await choiceCheck({ id: this.auditId, ...data })
+        this.getChoiceList()
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    // 关闭审核提示框
+    closeAudit () {
+      this.isShowAudit = false
+    },
+    showAudit (row) {
+      this.auditId = row.id
+      this.isShowAudit = true
+    },
+    // 弹出上下架提示框
+    changePublishState (row) {
+      const state = row.publishState
+      console.log(state)
+      this.$confirm(`你确认${state === '待发布' ? '上架' : '下架'}这道题目吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        await choicePublish({ id: row.id, publishState: state === '待发布' ? 1 : 0 })
+        this.$message({
+          type: 'success',
+          message: '上架成功!'
+        })
+      }).catch(() => {
+      })
+    },
+    // 修改题目
+    edit () {
+      console.log('跳转试题录入')
+    }
+  },
+  computed: {
+    chkState () {
+      return this.activeName === 'first' ? null : this.activeName === 'second' ? 0 : this.activeName === 'third' ? 1 : 2
     }
   }
 }

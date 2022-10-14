@@ -13,9 +13,15 @@
     <span>【题干】：</span>
     <div v-html="handeldata.question" style="color:blue"></div>
     <div>
-      <div style="padding:0 0 5px">{{handeldata.questionType}}题 选项：（以下选中的选项为正确答案）</div>
-      <div v-if="data.questionType==='1'" ><div v-for="item in data.options" :key="item.id" style="padding:10px 0"><el-radio  v-bind:value="value" :label="item.id">{{item.title}}</el-radio></div></div>
-      <div v-else >
+      <div style="padding:0 0 5px" v-if="data.questionType!=='3'">{{handeldata.questionType}}题 <span>选项：（以下选中的选项为正确答案）</span></div>
+      <!-- 单选情况 -->
+      <div v-if="data.questionType==='1'&&data.questionType!=='3'" >
+        <div v-for="item in data.options" :key="item.id" style="padding:10px 0">
+          <el-radio  v-bind:value="value" :label="item.id">{{item.title}}</el-radio>
+        </div>
+      </div>
+      <!-- 多选情况 -->
+      <div v-else-if="data.questionType!=='3'" >
           <el-checkbox-group v-model="checkBoxValue">
             <div v-for="item in data.options" :key="item.id">
             <el-checkbox :label="item.id" style="padding:10px 0" :checked="item.isRight===1" >{{item.title}}</el-checkbox>
@@ -63,7 +69,7 @@ export default {
       try {
         this.loading = true
         const { data } = await getQuestionsDetail({ id: this.handeldata.id })
-        console.log(data)
+        console.log(data.questionType)
         this.data = data
       } catch (error) {
         console.log(error)
@@ -74,7 +80,6 @@ export default {
   },
   computed: {
     value () {
-      console.log(this.data.options)
       if (!this.data.options) {
         return ''
       }
