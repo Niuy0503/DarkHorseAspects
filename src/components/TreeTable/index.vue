@@ -1,6 +1,14 @@
 <template>
-    <el-table :data="formatData"  :row-class-name="rowClassStatus" v-loading="listLoading"  element-loading-text="给我一点时间" fit highlight-current-row
-      style="width: 100%">
+    <el-table :data="formatData"
+      :row-class-name="rowClassStatus"
+      v-loading="listLoading"
+      element-loading-text="给我一点时间"
+      fit
+      highlight-current-row
+      style="width: 100%"
+      default-expand-all
+      :tree-props="{ children: 'childs', hasChildren: 'points' }"
+    >
     <el-table-column v-for="(column, index) in columns" :key="column.prop" :width="column.width" :prop="column.prop"
       :label="column.text">
       <template slot-scope="scope">
@@ -13,23 +21,50 @@
         >
         </expand>
         <span v-else>
-          {{scope.row[column.value]}}
+          <template v-if="column.value == 'title'">
+            <i
+              class="el-icon-folder-opened"
+              style="margin-left: 20px"
+              v-if="scope.row._level === 0"
+            />
+            <i
+              class="el-icon-document-remove"
+              style="margin-left: 40px"
+              v-if="
+                (scope.row._level === 1 || scope.row._level === 2) &&
+                !scope.row.is_point
+              "
+            />
+            <i
+              class="el-icon-view"
+              style="margin-left: 60px"
+              v-if="scope.row.is_point"
+            />
+            {{ scope.row[column.value] }}
+          </template>
+          <template v-if="column.value == 'code'">
+            {{ scope.row[column.value] }}
+          </template>
         </span>
       </template>
     </el-table-column>
     <el-table-column label="操作" width="260" align="center">
       <template  slot-scope="scope">
         <el-button
-          size="mini"
+          size="small"
           type="primary"
+          icon="el-icon-edit"
+          plain
+          circle
           @click="handleUpdate(scope.row)">
-          修改
         </el-button>
         <el-button
           size="mini"
           type="danger"
+          icon="el-icon-delete"
+          plain
+          circle
           @click="handleDelete(scope.row.id)">
-          删除
         </el-button>
       </template>
     </el-table-column>

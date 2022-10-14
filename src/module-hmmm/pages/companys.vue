@@ -181,7 +181,7 @@ export default {
     },
     // 新增用户，编辑用户
     async addUser (id) {
-      this.formData = {}
+      this.formData = { }
       this.$refs.companysaddRef.dialogFormV()
       if (id === 'add') {
         this.titleInfo.text = '创建'
@@ -203,7 +203,10 @@ export default {
         this.getList() // 重新加载数据
         this.$message.success('删除角色成功')
       } catch (error) {
-        this.$message.error('删除角色失败')
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
+        })
       }
     },
     // 切换状态
