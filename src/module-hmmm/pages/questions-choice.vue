@@ -19,7 +19,7 @@
           <el-button type="text" size="small" :disabled="row.chkState==='通过'||row.chkState==='拒绝'" @click="showAudit(row)">审核</el-button>
           <el-button type="text" size="small" :disabled="row.publishState==='已发布'" @click="edit">修改</el-button>
           <el-button type="text" size="small" @click="changePublishState(row)">{{row.publishState==='已发布'?'下架':'上架'}}</el-button>
-          <el-button type="text" size="small" :disabled="row.publishState==='已发布'">删除</el-button>
+          <el-button type="text" size="small" :disabled="row.publishState==='已发布'" @click="del(row)">删除</el-button>
         </template>
       </QuestionsTable>
       <!-- 分页组件 -->
@@ -38,6 +38,9 @@
     <!-- 试题预览 -->
     <el-dialog title="题目预览" :visible="isShowQuestion" width="900px" @close="isShowQuestion=false">
       <QuestionsPreview :handeldata="handelData" v-if="isShowQuestion"></QuestionsPreview>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="isShowQuestion = false">关闭</el-button>
+      </div>
     </el-dialog>
     <!-- 试题审核 -->
     <Audit :isShowAudit="isShowAudit" @closeAudit="closeAudit" @choiceCheck="audit"></Audit>
@@ -49,7 +52,7 @@ import BtnWrapper from '../components/questions/btn-wrapper.vue'
 import Search from '../components/questions/search.vue'
 import QuestionsTable from '../components/questions/questions-table.vue'
 import Audit from '../components/questions/audit.vue'
-import { choice as getChoiceList, choiceCheck, choicePublish } from '@/api/hmmm/questions'
+import { choice as getChoiceList, choiceCheck, choicePublish, remove } from '@/api/hmmm/questions'
 import { formatData } from '@/utils/formatData'
 import QuestionsPreview from '../components/questions-preview.vue'
 export default {
@@ -130,13 +133,13 @@ export default {
     // 弹出上下架提示框
     changePublishState (row) {
       const state = row.publishState
-      console.log(state)
       this.$confirm(`你确认${state === '待发布' ? '上架' : '下架'}这道题目吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(async () => {
         await choicePublish({ id: row.id, publishState: state === '待发布' ? 1 : 0 })
+        this.getChoiceList()
         this.$message({
           type: 'success',
           message: '上架成功!'
@@ -147,6 +150,22 @@ export default {
     // 修改题目
     edit () {
       console.log('跳转试题录入')
+    },
+    // 删除题目
+    async del (row) {
+      this.$confirm('此操作将永久删除该题目', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        await remove({ id: row.id })
+        this.getChoiceList()
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+      })
     }
   },
   computed: {

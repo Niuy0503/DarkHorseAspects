@@ -1,12 +1,12 @@
 <template>
   <div>
     <el-alert
-    :title="`数据一共${counts}条`"
-    type="info"
-    :closable="false"
-    style="margin-bottom: 15px;"
-    show-icon>
-  </el-alert>
+      :title="`数据一共${counts}条`"
+      type="info"
+      :closable="false"
+      style="margin-bottom: 15px;"
+      show-icon>
+    </el-alert>
   <!-- 表格主体 -->
   <el-table
       :data="tableData"

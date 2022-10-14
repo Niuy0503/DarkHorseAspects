@@ -10,13 +10,25 @@ export const formatData = function (data) {
     item.addDate = parseTime(item.addDate)
     if (item.chkState !== undefined) {
       const chkStateRes = chkType.find(res => {
-        return res.value === item.chkState
+        if (item.chkState === 0) {
+          return res.value === 1
+        } else if (item.chkState === 1) {
+          return res.value === 2
+        } else {
+          return res.value === 3
+        }
       })
       item.chkState = chkStateRes ? chkStateRes.label : ''
     }
     if (item.publishState !== undefined) {
       const publishStateRes = publishType.find(res => {
-        return res.value === item.publishState
+        if (item.publishState === 0) {
+          return res.value === 1
+        } else if (item.publishState === 1) {
+          return res.value === 2
+        } else {
+          return res.value === 3
+        }
       })
       item.publishState = publishStateRes ? publishStateRes.label : ''
     }

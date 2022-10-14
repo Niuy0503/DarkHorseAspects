@@ -28,7 +28,12 @@
       </el-pagination>
     </el-card>
     <!-- 弹出层 -->
-    <el-dialog title="题目预览" :visible="isShowQuestion" width="900px" @close="isShowQuestion=false"><QuestionsPreview :handeldata="handelData" v-if="isShowQuestion"></QuestionsPreview></el-dialog>
+    <el-dialog title="题目预览" :visible="isShowQuestion" width="900px" @close="isShowQuestion=false">
+      <QuestionsPreview :handeldata="handelData" v-if="isShowQuestion"></QuestionsPreview>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="isShowQuestion = false">关闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
