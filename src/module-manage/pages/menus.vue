@@ -47,8 +47,13 @@ export default {
   },
   methods: {
     async getList () {
-      const { data } = await list()
-      this.dataList = data
+      try {
+        this.listLoading = true
+        const { data } = await list()
+        this.dataList = data
+      } finally {
+        this.listLoading = false
+      }
     },
     // 新增菜单
     addMenus () {
