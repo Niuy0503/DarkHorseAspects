@@ -135,7 +135,7 @@
           <!-- 题干 -->
           <el-form-item label="题干：" prop="question">
             <!-- 富文本编辑器组件 -->
-            <RichText :height="200" @on-change="questionChange" />
+            <RichText :height="200" v-model="testQuestionsList.question" />
           </el-form-item>
 
           <!-- 选项 -->
@@ -184,7 +184,7 @@
 
           <!-- 答案解析 -->
           <el-form-item label="答案解析：" prop="answer">
-            <RichText :height="200" @on-change="answerChange" />
+            <RichText :height="200" v-model="testQuestionsList.answer" />
           </el-form-item>
 
           <!-- 题目备注 -->
@@ -228,7 +228,6 @@ import { simple as tagsSimpleAPI } from '@/api/hmmm/tags.js'
 import { list as companysAPI } from '@/api/hmmm/companys.js'
 import { add as addBasicQuestionAPI } from '@/api/hmmm/questions.js'
 import { provinces, citys } from '@/api/hmmm/citys'
-
 import { difficulty, questionType, direction } from '@/api/hmmm/constants.js'
 import UploadImg from '../components/uploadImg.vue'
 export default {
@@ -312,20 +311,13 @@ export default {
     },
     // 选中的学科发送变化时触发
     subjectsChange () {
+      this.testQuestionsList.catalogID = null
       this.getDirectorySimpleList()
       this.getTagsSimpleList()
     },
     // 省级市改变时清空地级市value值
     provinceChange () {
       this.testQuestionsList.city = ''
-    },
-    // 富文本编辑器 - 题干内容
-    questionChange ({ html }) {
-      this.testQuestionsList.question = html
-    },
-    // 富文本编辑区 - 答案解析
-    answerChange ({ html }) {
-      this.testQuestionsList.answer = html
     },
     // 获取默认 Options 数组
     getDefaultOptions () {
