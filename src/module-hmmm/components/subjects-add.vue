@@ -22,7 +22,7 @@
            </el-switch>
         </template>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="text-align:right">
          <el-button @click="handleClose">取 消</el-button>
          <el-button type="primary" v-loading="loading" @click="submit">确 定</el-button>
       </el-form-item>

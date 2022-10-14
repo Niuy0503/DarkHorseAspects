@@ -1,4 +1,5 @@
 <template>
+<!-- 学科管理 -->
   <div class='container'>
     <el-card>
        <el-row>
@@ -77,7 +78,6 @@
       width="140">
     </el-table-column>
     <el-table-column
-      prop="address"
       label="操作"
       width="240">
       <template slot-scope="{row}">
@@ -210,10 +210,10 @@ export default {
     padding-right: 0;
 }
 :deep(.el-table__header){
-  width: 1298px!important;
+  width: 100%!important;
 }
 :deep(.el-table__body){
-  width: 1298px !important;
+  width: 100% !important;
 }
 
 :deep(.el-table th.el-table__cell.is-leaf) {
@@ -225,6 +225,9 @@ export default {
 .pages{
   margin-top: 20px;
   text-align: right;
+}
+:deep(.el-form-item__label){
+  width:80px;
 }
 }
 </style>
