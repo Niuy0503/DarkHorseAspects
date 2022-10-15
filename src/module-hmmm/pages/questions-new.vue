@@ -281,7 +281,6 @@ export default {
       Ascll: 65,
       tags: [],
       loading: false,
-      id: 55,
       isOnSubmit: true
     }
   },
@@ -294,7 +293,7 @@ export default {
   methods: {
     // 通过id获取题库详情
     async gettestQuestionsDetail () {
-      const { data } = await gettestQuestionsDetailAPI({ id: this.id })
+      const { data } = await gettestQuestionsDetailAPI({ id: this.$route.query.id })
       this.testQuestionsList = data
       console.log('gettestQuestionsDetail', data)
       this.getDirectorySimpleList()
