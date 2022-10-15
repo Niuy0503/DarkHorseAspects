@@ -2,6 +2,19 @@
 <!-- 标签管理 -->
   <div class='container'>
      <el-card>
+      <div slot="header" class="clearfix" v-if="isShowHeader">
+       <span style="font-size: 14px;line-height: 1;">
+        <span>学科管理</span>
+       <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
+       </span>
+        <span style="font-size: 14px;line-height: 1;">
+        <span>学科名称</span>
+       <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
+       </span>
+        <span style="font-size: 14px;line-height: 1;">
+        <span>标签管理</span>
+       </span>
+       </div>
        <el-row>
         <el-col :span="18">
           <el-form :inline="true" :model="fromData"  class="demo-form-inline">
@@ -23,6 +36,7 @@
           </el-form>
         </el-col>
         <el-col :span="6" style="text-align:right">
+          <el-button type="text" icon="el-icon-back" @click="$router.go(-1)" v-if="isShow">返回学科</el-button>
           <el-button type="success" icon="el-icon-edit" @click="addTags">新增标签</el-button>
         </el-col>
       </el-row>
@@ -112,7 +126,9 @@ export default {
       counts: 0, // 总记录数
       tagsList: [], // 目录列表
       dialogVisible: false,
-      statusList: status
+      statusList: status,
+      isShowHeader: false,
+      isShow: false
     }
   },
   created () {
@@ -147,7 +163,6 @@ export default {
     },
     // 格式化状态
     formatterFn (row, column, cellValue) {
-      console.log(cellValue)
       const res = this.statusList.find(ele => ele.value !== cellValue)
       return res ? '已' + res.label : ''
     },
