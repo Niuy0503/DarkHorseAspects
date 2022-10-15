@@ -285,7 +285,6 @@ export default {
     }
   },
   created () {
-    this.gettestQuestionsDetail()
     this.getSubjectsSimpleList()
     this.getCompanysInfoList()
     this.getDefaultOptions()
@@ -298,13 +297,8 @@ export default {
       console.log('gettestQuestionsDetail', data)
       this.getDirectorySimpleList()
       this.getTagsSimpleList()
-      // console.log(this.testQuestionsList.tags.join(','))
-      // if (this.testQuestionsList.tags.includes(',')) {
       const arr = this.testQuestionsList.tags.split(',')
       arr.forEach(item => this.tags.push(item))
-      // } else {
-      // this.tags.push(this.testQuestionsList.tags)
-      // }
     },
     // 获取学科简单列表
     async getSubjectsSimpleList () {
@@ -394,6 +388,7 @@ export default {
         // 发送请求
         this.isOnSubmit ? await addBasicQuestionAPI(this.testQuestionsList) : await updateTestQuestionsAPI(this.testQuestionsList)
         this.isOnSubmit ? this.$message.success('添加成功') : this.$message.success('修改成功')
+        this.$router.push('/questions/list')
       } catch (error) {
         this.isOnSubmit ? this.$message.success('添加失败') : this.$message.success('修改失败')
       } finally {
@@ -413,7 +408,6 @@ export default {
   },
   watch: {
     '$route.query.id': {
-      immediate: true,
       handler () {
         this.isOnSubmit = false
         this.gettestQuestionsDetail()
