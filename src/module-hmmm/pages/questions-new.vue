@@ -212,7 +212,7 @@
 
           <!-- 提交按钮 -->
           <el-form-item>
-            <el-button type="primary" @click="onSubmit" v-if="isOnSubmit"
+            <el-button type="primary" @click="onSubmit" v-if="!$route.query.id"
               >确认提交</el-button
             >
             <el-button type="success" @click="onSubmit" v-else
@@ -293,12 +293,25 @@ export default {
     // 通过id获取题库详情
     async gettestQuestionsDetail () {
       const { data } = await gettestQuestionsDetailAPI({ id: this.$route.query.id })
+      console.log(data)
       this.testQuestionsList = data
-      console.log('gettestQuestionsDetail', data)
       this.getDirectorySimpleList()
       this.getTagsSimpleList()
       const arr = this.testQuestionsList.tags.split(',')
       arr.forEach(item => this.tags.push(item))
+      console.log(this.testQuestionsList.options)
+      console.log(this.testQuestionsList.options.reverse(), 'reverse')
+      this.testQuestionsList.options.reverse().forEach(item => {
+        if (item.isRight) {
+          item.isRight = true
+          console.log(item.code, 'code')
+          this.radio = item.code
+        } else {
+          item.isRight = false
+        }
+      })
+      console.log(this.radio)
+      console.log('gettestQuestionsDetail', data)
     },
     // 获取学科简单列表
     async getSubjectsSimpleList () {
@@ -372,8 +385,9 @@ export default {
     // 提交表单
     async onSubmit () {
       try {
+        console.log(this.radio)
         // v-loading
-        this.loading = true
+        // this.loading = true
         // 表单验证
         await this.$refs.testQuestionsForm.validate()
         // 处理标签数据
@@ -386,11 +400,12 @@ export default {
         }
         console.log(this.testQuestionsList.options)
         // 发送请求
-        this.isOnSubmit ? await addBasicQuestionAPI(this.testQuestionsList) : await updateTestQuestionsAPI(this.testQuestionsList)
-        this.isOnSubmit ? this.$message.success('添加成功') : this.$message.success('修改成功')
+        !(this.$route.query.id) ? await addBasicQuestionAPI(this.testQuestionsList) : await updateTestQuestionsAPI(this.testQuestionsList)
+        !(this.$route.query.id) ? this.$message.success('添加成功') : this.$message.success('修改成功')
         this.$router.push('/questions/list')
       } catch (error) {
-        this.isOnSubmit ? this.$message.success('添加失败') : this.$message.success('修改失败')
+        !(this.$route.query.id) ? this.$message.error('添加失败') : this.$message.error('修改失败')
+        console.log(error)
       } finally {
         this.loading = false
       }
@@ -408,9 +423,11 @@ export default {
   },
   watch: {
     '$route.query.id': {
+      immediate: true,
       handler () {
-        this.isOnSubmit = false
-        this.gettestQuestionsDetail()
+        if (this.$route.query.id) {
+          this.gettestQuestionsDetail()
+        }
       }
     }
   }
