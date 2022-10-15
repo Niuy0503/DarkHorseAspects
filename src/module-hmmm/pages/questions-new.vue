@@ -212,7 +212,12 @@
 
           <!-- 提交按钮 -->
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">确认提交</el-button>
+            <el-button type="primary" @click="onSubmit" v-if="isOnSubmit"
+              >确认提交</el-button
+            >
+            <el-button type="success" @click="onSubmit" v-else
+              >确认修改</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
@@ -226,7 +231,7 @@ import { simple as subjectsSimpleAPI } from '@/api/hmmm/subjects.js'
 import { simple as directorySimpleAPI } from '@/api/hmmm/directorys.js'
 import { simple as tagsSimpleAPI } from '@/api/hmmm/tags.js'
 import { list as companysAPI } from '@/api/hmmm/companys.js'
-import { add as addBasicQuestionAPI } from '@/api/hmmm/questions.js'
+import { add as addBasicQuestionAPI, detail as gettestQuestionsDetailAPI, update as updateTestQuestionsAPI } from '@/api/hmmm/questions.js'
 import { provinces, citys } from '@/api/hmmm/citys'
 import { difficulty, questionType, direction } from '@/api/hmmm/constants.js'
 import UploadImg from '../components/uploadImg.vue'
@@ -275,15 +280,33 @@ export default {
       direction,
       Ascll: 65,
       tags: [],
-      loading: false
+      loading: false,
+      id: 55,
+      isOnSubmit: true
     }
   },
   created () {
+    this.gettestQuestionsDetail()
     this.getSubjectsSimpleList()
     this.getCompanysInfoList()
     this.getDefaultOptions()
   },
   methods: {
+    // 通过id获取题库详情
+    async gettestQuestionsDetail () {
+      const { data } = await gettestQuestionsDetailAPI({ id: this.id })
+      this.testQuestionsList = data
+      console.log('gettestQuestionsDetail', data)
+      this.getDirectorySimpleList()
+      this.getTagsSimpleList()
+      // console.log(this.testQuestionsList.tags.join(','))
+      // if (this.testQuestionsList.tags.includes(',')) {
+      const arr = this.testQuestionsList.tags.split(',')
+      arr.forEach(item => this.tags.push(item))
+      // } else {
+      // this.tags.push(this.testQuestionsList.tags)
+      // }
+    },
     // 获取学科简单列表
     async getSubjectsSimpleList () {
       const { data } = await subjectsSimpleAPI()
@@ -370,10 +393,10 @@ export default {
         }
         console.log(this.testQuestionsList.options)
         // 发送请求
-        await addBasicQuestionAPI(this.testQuestionsList)
-        this.$message.success('添加成功')
+        this.isOnSubmit ? await addBasicQuestionAPI(this.testQuestionsList) : await updateTestQuestionsAPI(this.testQuestionsList)
+        this.isOnSubmit ? this.$message.success('添加成功') : this.$message.success('修改成功')
       } catch (error) {
-        this.$message.error('添加失败')
+        this.isOnSubmit ? this.$message.success('添加失败') : this.$message.success('修改失败')
       } finally {
         this.loading = false
       }
@@ -387,6 +410,15 @@ export default {
     // 地级市城市
     citysList () {
       return citys(this.testQuestionsList.province)
+    }
+  },
+  watch: {
+    '$route.query.id': {
+      immediate: true,
+      handler () {
+        this.isOnSubmit = false
+        this.gettestQuestionsDetail()
+      }
     }
   }
 }
