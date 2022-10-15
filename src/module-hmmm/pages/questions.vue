@@ -9,7 +9,7 @@
       <QuestionsTable :tableColumnList="tableColumnList" :counts="counts" :tableData="tableData" :loading="loading">
       <template #OperationColumn="row">
         <el-button type="primary" icon="el-icon-view" circle plain size="small" @click="checkQuestion(row)"></el-button>
-        <el-button type="success" icon="el-icon-edit" circle plain size="small"></el-button>
+        <el-button type="success" icon="el-icon-edit" circle plain size="small" @click="$router.push({ path: '/questions/new', query: { id: row.row.id } })"></el-button>
         <el-button type="danger" icon="el-icon-delete" circle plain size="small" @click="removeQuestion(row)"></el-button>
         <el-button type="warning" icon="el-icon-check" circle plain size="small" @click="choiceAdd(row)"></el-button>
       </template>

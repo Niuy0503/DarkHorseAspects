@@ -17,7 +17,7 @@
         <template #OperationColumn="{row}" >
           <el-button type="text" size="small" @click="checkQuestion(row)">预览</el-button>
           <el-button type="text" size="small" :disabled="row.chkState==='通过'||row.chkState==='拒绝'" @click="showAudit(row)">审核</el-button>
-          <el-button type="text" size="small" :disabled="row.publishState==='已发布'" @click="edit">修改</el-button>
+          <el-button type="text" size="small" :disabled="row.publishState==='已发布'" @click="$router.push({ path: '/questions/new', query: { id: row.id } })">修改</el-button>
           <el-button type="text" size="small" @click="changePublishState(row)">{{row.publishState==='已发布'?'下架':'上架'}}</el-button>
           <el-button type="text" size="small" :disabled="row.publishState==='已发布'" @click="del(row)">删除</el-button>
         </template>
@@ -146,10 +146,6 @@ export default {
         })
       }).catch(() => {
       })
-    },
-    // 修改题目
-    edit () {
-      console.log('跳转试题录入')
     },
     // 删除题目
     async del (row) {
