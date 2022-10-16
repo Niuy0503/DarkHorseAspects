@@ -42,8 +42,7 @@
     </el-table-column>
     <el-table-column
       prop="accuracyRate"
-      label="正确率(%)"
-      width="133">
+      label="正确率(%)">
     </el-table-column>
     <el-table-column
       prop="userName"
