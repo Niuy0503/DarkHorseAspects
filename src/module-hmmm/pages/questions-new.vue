@@ -293,15 +293,16 @@ export default {
     // 通过id获取题库详情
     async gettestQuestionsDetail () {
       const { data } = await gettestQuestionsDetailAPI({ id: this.$route.query.id })
-      console.log(data)
       this.testQuestionsList = data
       this.getDirectorySimpleList()
       this.getTagsSimpleList()
       const arr = this.testQuestionsList.tags.split(',')
       arr.forEach(item => this.tags.push(item))
-      console.log(this.testQuestionsList.options)
-      console.log(this.testQuestionsList.options.reverse(), 'reverse')
-      this.testQuestionsList.options.reverse().forEach(item => {
+
+      this.testQuestionsList.options.sort((a, b) => {
+        return a.code.charCodeAt() - b.code.charCodeAt()
+      })
+      this.testQuestionsList.options.forEach(item => {
         if (item.isRight) {
           item.isRight = true
           console.log(item.code, 'code')
