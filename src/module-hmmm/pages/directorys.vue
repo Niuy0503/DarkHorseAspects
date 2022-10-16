@@ -2,27 +2,41 @@
 <!-- 目录管理 -->
   <div class='container'>
      <el-card>
+       <div slot="header" class="clearfix" v-if="$route.query.name? true : false">
+       <span style="font-size: 14px;line-height: 1;">
+        <span>学科管理</span>
+       <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
+       </span>
+        <span style="font-size: 14px;line-height: 1;">
+        <span>{{$route.query.name}}</span>
+       <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
+       </span>
+        <span style="font-size: 14px;line-height: 1;">
+        <span>目录管理</span>
+       </span>
+       </div>
        <el-row>
         <el-col :span="18">
           <el-form :inline="true" :model="fromData" class="demo-form-inline">
-             <el-form-item label="目录名称">
-          <el-input v-model="fromData.directoryName"></el-input>
+          <el-form-item label="目录名称" prop="directoryName">
+             <el-input v-model="fromData.directoryName"></el-input>
           </el-form-item>
-          <el-form-item label="状态">
+          <el-form-item label="状态" prop="state">
           <el-select v-model="fromData.state" placeholder="请选择">
             <el-option label="启用" :value="1"></el-option>
             <el-option label="禁用" :value="0"></el-option>
           </el-select>
           </el-form-item>
             <el-form-item>
-            <el-button plain @click="keywords = ''">清除</el-button>
+            <el-button plain @click="clearFormData">清除</el-button>
             </el-form-item>
             <el-form-item>
-            <el-button type="primary">搜索</el-button>
+            <el-button type="primary" @click="getDirectoyrs">搜索</el-button>
             </el-form-item>
           </el-form>
         </el-col>
         <el-col :span="6" style="text-align:right">
+          <el-button type="text" icon="el-icon-back" @click="$router.go(-1)" v-if="$route.query.name? true : false">返回学科</el-button>
           <el-button type="success" icon="el-icon-edit" @click="addDirectorys">新增目录</el-button>
         </el-col>
       </el-row>
@@ -72,16 +86,17 @@
     <el-table-column
       prop="state"
       label="状态"
-      width="180">
+      width="180"
+      :formatter="formatterFn">
     </el-table-column>
     <el-table-column
       label="操作"
       width="150">
-      <template>
-        <el-button type="text">禁用</el-button>
-        <el-button type="text">修改</el-button>
-        <el-button type="text">删除</el-button>
-        </template>
+      <template slot-scope="{row}">
+        <el-button type="text" @click="changeState(row)">{{row.state === 1?'启用':'禁用'}}</el-button>
+        <el-button type="text" @click="editDirectorys(row)" :disabled="row.state === 0">修改</el-button>
+        <el-button type="text" @click="delDirectorys(row)" :disabled="row.state === 0">删除</el-button>
+      </template>
     </el-table-column>
       </el-table>
     <PageTool :total="counts"
@@ -91,29 +106,31 @@
     @pageSizeChange="changePageSize">
     </PageTool>
     </el-card>
-    <directorys-add :dialog-visible.sync="dialogVisible"></directorys-add>
+    <directorys-add ref="addDirectorys" :dialog-visible.sync="dialogVisible"  @refreshList="getDirectoyrs"></directorys-add>
   </div>
 </template>
 
 <script>
-import { list } from '@/api/hmmm/directorys.js'
+import { list, remove, changeState } from '@/api/hmmm/directorys.js'
 import PageTool from '../components/pageTool.vue'
 import DirectorysAdd from '../components/directorys-add.vue'
+import { status } from '@/api/hmmm/constants.js'
 export default {
   components: { PageTool, DirectorysAdd },
   data () {
     return {
       keywords: '', // 输入框关键词
       fromData: {
-        directoryName: '', // 目录名称
-        state: ''// 状态
+        directoryName: null, // 目录名称
+        state: null // 状态
       },
       page: 1, // 当前页
       pagesize: 10, // 页面大小
       pages: 1, // 总页数
       counts: 0, // 总记录数
       directorysList: [], // 目录列表
-      dialogVisible: false
+      dialogVisible: false,
+      statusList: status
     }
   },
   created () {
@@ -125,7 +142,10 @@ export default {
       try {
         const { data } = await list({
           page: this.page,
-          pagesize: this.pagesize
+          pagesize: this.pagesize,
+          subjectID: this.$route.query.id,
+          directoryName: this.fromData.directoryName,
+          state: this.fromData.state
         })
         this.directorysList = data.items
         this.page = data.page
@@ -136,10 +156,57 @@ export default {
         console.log(error)
       }
     },
+    // 清空搜索框
+    clearFormData () {
+      this.fromData = {
+        directoryName: null,
+        state: null
+      }
+    },
+    // 格式化状态
+    formatterFn (row, column, cellValue) {
+      const res = this.statusList.find(ele => ele.value !== cellValue)
+      return res ? '已' + res.label : ''
+    },
+    // 点击改变状态
+    async changeState (row) {
+      // row.state = !this.status
+      try {
+        this.status = row.state === 1 ? 0 : 1
+        await changeState({
+          id: row.id,
+          state: this.status
+        })
+        // 刷新列表
+        this.getDirectoyrs()
+      } catch (error) {
+        console.log(error)
+      }
+    },
     // 新增目录
     addDirectorys () {
-      console.log(11)
       this.dialogVisible = true
+    },
+    // 修改标签
+    editDirectorys (row) {
+      this.$refs.addDirectorys.formData = { ...row }
+      // 打开弹窗
+      this.dialogVisible = true
+    },
+    // 删除标签
+    async delDirectorys (row) {
+      try {
+        await this.$confirm('此操作将永久删除该标签, 是否继续?', '提示', {
+          type: 'warning'
+        })
+        // 调用接口
+        await remove(row)
+        this.$message.success('删除成功')
+        // 刷新列表
+        this.getDirectoyrs()
+      } catch (error) {
+        console.log(error)
+      }
     },
     // 进入下一页
     changePage (num) {
@@ -167,7 +234,6 @@ export default {
     font-weight: 500;
 }
 .el-button--text {
-    color: #409eff;
     background: 0 0;
     padding-left: 0;
     padding-right: 0;

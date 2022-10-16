@@ -58,21 +58,21 @@ export default {
   methods: {
     handleClose () {
       this.$emit('update:dialogVisible', false)
-      this.$refs.form.resetFields()
+      this.$refs.subjectDialogForm.resetFields()
       this.formDate = {
         subjectName: '',
-        isFrontDisplay: false
+        isFrontDisplay: ''
       }
     },
     async submit () {
       try {
         this.$refs.subjectDialogForm.validate()// 表单校验通过
         this.loading = true
+        console.log(this.formDate.id)
         // 发送请求
         this.formDate.id ? await update(this.formDate) : await add(this.formDate)
         this.$message.success(this.formDate.id ? '修改成功' : '添加成功')
         // 刷新父组件页面
-        this.$parent.getSubjectDetails()
         this.$emit('refreshList')
         // 关闭弹窗
         this.handleClose()
