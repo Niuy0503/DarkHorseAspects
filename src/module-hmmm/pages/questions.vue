@@ -60,7 +60,7 @@ export default {
         { label: '学科', width: 80, prop: 'subject' },
         { label: '目录', width: 80, prop: 'catalog' },
         { label: '题型', width: 80, prop: 'questionType' },
-        { label: '题干', width: 280, prop: 'question' },
+        { label: '题干', prop: 'question' },
         { label: '录入时间', width: 180, prop: 'addDate' },
         { label: '难度', width: 80, prop: 'difficulty' },
         { label: '录入人', width: 80, prop: 'creator' }
