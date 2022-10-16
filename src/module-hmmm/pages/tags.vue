@@ -2,13 +2,13 @@
 <!-- 标签管理 -->
   <div class='container'>
      <el-card>
-      <div slot="header" class="clearfix" v-if="isShowHeader">
+      <div slot="header" class="clearfix" v-if="$route.query.name? true : false">
        <span style="font-size: 14px;line-height: 1;">
         <span>学科管理</span>
        <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
        </span>
         <span style="font-size: 14px;line-height: 1;">
-        <span>学科名称</span>
+        <span>{{$route.query.name}}</span>
        <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
        </span>
         <span style="font-size: 14px;line-height: 1;">
@@ -36,7 +36,7 @@
           </el-form>
         </el-col>
         <el-col :span="6" style="text-align:right">
-          <el-button type="text" icon="el-icon-back" @click="$router.go(-1)" v-if="isShow">返回学科</el-button>
+          <el-button type="text" icon="el-icon-back" @click="$router.go(-1)" v-if="$route.query.name? true : false">返回学科</el-button>
           <el-button type="success" icon="el-icon-edit" @click="addTags">新增标签</el-button>
         </el-col>
       </el-row>
@@ -101,19 +101,19 @@
     @pageSizeChange="changePageSize">
     </PageTool>
     </el-card>
-    <directorys-add ref="addTags" :dialog-visible.sync="dialogVisible" @refreshList="getTags"></directorys-add>
+    <tagsAdd ref="addTags" :dialog-visible.sync="dialogVisible" @refreshList="getTags"></tagsAdd>
   </div>
 </template>
 
 <script>
 import { list, remove, changeState } from '@/api/hmmm/tags.js'
 import PageTool from '../components/pageTool.vue'
-import DirectorysAdd from '../components/tags-add.vue'
+import tagsAdd from '../components/tags-add.vue'
 import { status } from '@/api/hmmm/constants.js'
 
 export default {
   name: 'directorys',
-  components: { PageTool, DirectorysAdd },
+  components: { PageTool, tagsAdd },
   data () {
     return {
       fromData: {
@@ -126,9 +126,7 @@ export default {
       counts: 0, // 总记录数
       tagsList: [], // 目录列表
       dialogVisible: false,
-      statusList: status,
-      isShowHeader: false,
-      isShow: false
+      statusList: status
     }
   },
   created () {
@@ -141,7 +139,7 @@ export default {
         const { data } = await list({
           page: this.page,
           pagesize: this.pagesize,
-          // subiectId: this.subjectID,
+          subjectID: this.$route.query.id,
           tagName: this.fromData.tagName,
           state: this.fromData.state
         })
@@ -181,17 +179,17 @@ export default {
         console.log(error)
       }
     },
-    // 新增目录
+    // 新增标签
     addTags () {
       this.dialogVisible = true
     },
-    // 修改目录
+    // 修改标签
     editTags (row) {
       this.$refs.addTags.formData = { ...row }
       // 打开弹窗
       this.dialogVisible = true
     },
-    // 删除目录
+    // 删除标签
     async delTags (row) {
       try {
         await this.$confirm('此操作将永久删除该标签, 是否继续?', '提示', {

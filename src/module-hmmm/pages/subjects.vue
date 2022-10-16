@@ -81,8 +81,8 @@
       label="操作"
       width="240">
       <template slot-scope="{row}">
-        <el-button type="text" @click="$router.push('/subjects/directorys')">学科分类</el-button>
-        <el-button type="text" @click="$router.push('/subjects/tags')">学科标签</el-button>
+        <el-button type="text" @click="goDirectorys(row)">学科分类</el-button>
+        <el-button type="text" @click="goTags(row)">学科标签</el-button>
         <el-button type="text" @click="editSubject(row)">修改</el-button>
         <el-button type="text" @click="delSubject(row)">删除</el-button>
         </template>
@@ -186,6 +186,20 @@ export default {
     changePageSize (size) {
       this.pagesize = size
       this.getSubjectDetails()
+    },
+    // 跳转到目录页面
+    goDirectorys (row) {
+      this.$router.push({
+        path: '/subjects/directorys',
+        query: { id: row.id, name: row.subjectName }
+      })
+    },
+    // 跳转到标签页面
+    goTags (row) {
+      this.$router.push({
+        path: '/subjects/tags',
+        query: { id: row.id, name: row.subjectName }
+      })
     }
   }
 

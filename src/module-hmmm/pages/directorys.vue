@@ -2,13 +2,13 @@
 <!-- 目录管理 -->
   <div class='container'>
      <el-card>
-       <div slot="header" class="clearfix" v-if="isShowHeader">
+       <div slot="header" class="clearfix" v-if="$route.query.name? true : false">
        <span style="font-size: 14px;line-height: 1;">
         <span>学科管理</span>
        <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
        </span>
         <span style="font-size: 14px;line-height: 1;">
-        <span>学科名称</span>
+        <span>{{$route.query.name}}</span>
        <i style="color: #c0c4cc;" class="el-icon-arrow-right"></i>
        </span>
         <span style="font-size: 14px;line-height: 1;">
@@ -17,14 +17,14 @@
        </div>
        <el-row>
         <el-col :span="18">
-          <el-form :inline="true" :model="fromData"  class="demo-form-inline">
-             <el-form-item label="目录名称" prop="directoryName">
-          <el-input v-model="fromData.directoryName"></el-input>
+          <el-form :inline="true" :model="fromData" class="demo-form-inline">
+          <el-form-item label="目录名称" prop="directoryName">
+             <el-input v-model="fromData.directoryName"></el-input>
           </el-form-item>
           <el-form-item label="状态" prop="state">
           <el-select v-model="fromData.state" placeholder="请选择">
-           <el-option label="启用" :value="0"></el-option>
-           <el-option label="禁用" :value="1"></el-option>
+            <el-option label="启用" :value="1"></el-option>
+            <el-option label="禁用" :value="0"></el-option>
           </el-select>
           </el-form-item>
             <el-form-item>
@@ -36,7 +36,7 @@
           </el-form>
         </el-col>
         <el-col :span="6" style="text-align:right">
-          <el-button type="text" icon="el-icon-back" @click="$router.go(-1)" v-if="isShow">返回学科</el-button>
+          <el-button type="text" icon="el-icon-back" @click="$router.go(-1)" v-if="$route.query.name? true : false">返回学科</el-button>
           <el-button type="success" icon="el-icon-edit" @click="addDirectorys">新增目录</el-button>
         </el-col>
       </el-row>
@@ -106,7 +106,7 @@
     @pageSizeChange="changePageSize">
     </PageTool>
     </el-card>
-    <directorys-add ref="addDirectorys" :dialog-visible.sync="dialogVisible" @refreshList="getDirectoyrs"></directorys-add>
+    <directorys-add ref="addDirectorys" :dialog-visible.sync="dialogVisible"  @refreshList="getDirectoyrs"></directorys-add>
   </div>
 </template>
 
@@ -115,12 +115,11 @@ import { list, remove, changeState } from '@/api/hmmm/directorys.js'
 import PageTool from '../components/pageTool.vue'
 import DirectorysAdd from '../components/directorys-add.vue'
 import { status } from '@/api/hmmm/constants.js'
-
 export default {
-  name: 'directorys',
   components: { PageTool, DirectorysAdd },
   data () {
     return {
+      keywords: '', // 输入框关键词
       fromData: {
         directoryName: null, // 目录名称
         state: null // 状态
@@ -131,9 +130,7 @@ export default {
       counts: 0, // 总记录数
       directorysList: [], // 目录列表
       dialogVisible: false,
-      statusList: status,
-      isShowHeader: false,
-      isShow: false
+      statusList: status
     }
   },
   created () {
@@ -146,7 +143,7 @@ export default {
         const { data } = await list({
           page: this.page,
           pagesize: this.pagesize,
-          // subiectId: this.subjectID,
+          subjectID: this.$route.query.id,
           directoryName: this.fromData.directoryName,
           state: this.fromData.state
         })
@@ -190,16 +187,16 @@ export default {
     addDirectorys () {
       this.dialogVisible = true
     },
-    // 修改目录
+    // 修改标签
     editDirectorys (row) {
       this.$refs.addDirectorys.formData = { ...row }
       // 打开弹窗
       this.dialogVisible = true
     },
-    // 删除目录
+    // 删除标签
     async delDirectorys (row) {
       try {
-        await this.$confirm('此操作将永久删除该目录, 是否继续?', '提示', {
+        await this.$confirm('此操作将永久删除该标签, 是否继续?', '提示', {
           type: 'warning'
         })
         // 调用接口

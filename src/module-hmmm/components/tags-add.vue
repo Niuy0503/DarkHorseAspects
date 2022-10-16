@@ -13,7 +13,7 @@
          style="width:100%"
          placeholder="请选择"
         >
-          <el-option v-for="item in subjectNameList" :key="item.id" :label="item.subjectName" :value="item.id"></el-option>
+          <el-option v-for="item in subjectNameList" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
       </el-form-item>
       <el-form-item label="标签名称" prop="tagName"
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { list } from '@/api/hmmm/subjects.js'
+import { simple } from '@/api/hmmm/subjects.js'
 import { add, update } from '@/api/hmmm/tags.js'
 export default {
   name: 'adddirectory',
@@ -67,10 +67,10 @@ export default {
         tagName: ''
       }
     },
-    // 获取学科列表
+    // 获取学科简单列表
     async getSubjectName () {
-      const { data } = await list()
-      this.subjectNameList = data.items
+      const { data } = await simple()
+      this.subjectNameList = data
     },
     async submit () {
       try {
