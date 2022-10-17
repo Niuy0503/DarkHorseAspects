@@ -1,15 +1,16 @@
 <template>
   <div class="pages">
-      <el-pagination background
+    <el-pagination
+      background
       @size-change="onPageSizeChange"
       @current-change="onPageChange"
       :current-page="Number(paginationPage)"
       :total="Number(total)"
       :page-size="Number(paginationPagesize)"
-      :page-sizes="[10,20,30, 50]"
+      :page-sizes="[2, 4, 6, 8, 10]"
       layout="sizes, prev, pager, next, jumper"
-      >
-      </el-pagination>
+    >
+    </el-pagination>
   </div>
 </template>
 <script>
@@ -33,5 +34,11 @@ export default {
 }
 </script>
 <style>
-.blue{color: #409EFF;}
+.blue {
+  color: #409eff;
+}
+.pages {
+  margin-top: 20px;
+text-align: right;
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="add-form">
-    <el-dialog :title="text+pageTitle" :visible.sync="dialogFormVisible">
+    <el-dialog :title="text+pageTitle" :visible="dialogFormVisible" :before-close="handleClose">
       <el-form
         :rules="ruleInline"
         ref="dataForm"
@@ -37,8 +37,8 @@ import { detail, update, add } from '@/api/base/permissions'
 import { list } from '@/api/base/menus.js'
 let _this = []
 export default {
-  name: 'usersAdd',
-  props: ['text', 'pageTitle', 'ruleInline'],
+  name: 'permissionsAdd',
+  props: ['pageTitle', 'ruleInline'],
   data () {
     return {
       dialogFormVisible: false,
@@ -58,7 +58,12 @@ export default {
     }
   },
   computed: {
+    text () {
+      return this.formBase.id ? '修改' : '创建'
+    },
     treeData () {
+      console.log(this.formBase.permissions)
+      if (!this.formBase.permissions) return
       function createNode (item) {
         // 复选框选择
         let checked = false
@@ -117,6 +122,7 @@ export default {
     // 弹层显示
     dialogFormV () {
       this.dialogFormVisible = true
+      this.$forceUpdate()
     },
     // 弹层隐藏
     dialogFormH () {
@@ -125,15 +131,13 @@ export default {
     // 退出
     handleClose () {
       this.$emit('handleCloseModal')
+      this.$refs.dataForm.resetFields()
+      this.formBase = {}
     },
     // 表单重置
-    handleResetForm () {
-      this.formBase = {
-        id: 0,
-        title: '',
-        permissions: []
-      }
-    },
+    // handleResetForm () {
+    // },
+
     // 编辑详情数据加载
     hanldeEditForm (objeditId) {
       this.formBase.id = objeditId
@@ -147,6 +151,7 @@ export default {
         this.formBase.id = ret.data.id
         this.formBase.title = ret.data.title
         this.formBase.permissions = ret.data.permissions
+        console.log(ret.data.permissions)
       })
     },
     setupData () {
@@ -163,7 +168,7 @@ export default {
     handleAdd (object) {
       // 读取完整节点
       const curPermissions = new Set()
-      // function parse(nodes, selectedId) {
+      // function parse (nodes, selectedId) {
       //   for (const it of nodes) {
       //     let isFind = false
       //     if (it.childs !== undefined) {
@@ -243,7 +248,8 @@ export default {
   },
   // 挂载结束
 
-  mounted: function () {},
+  mounted: function () {
+  },
   // 创建完毕状态
   created () {
     _this = this
