@@ -5,7 +5,16 @@ import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const instance = axios.create({
+<<<<<<< HEAD
   baseURL: 'http://liufusong.top:7001/', // api的base_url
+=======
+<<<<<<< HEAD
+  baseURL: 'http://liufusong.top:7001/', // api的base_url
+=======
+  baseURL: 'http://hmmm-api.itheima.net/', // api的base_url
+  // baseURL: 'http://liufusong.top:7001/', // api的base_url
+>>>>>>> c912b9e0be4a34d719480372db8ab4a893037357
+>>>>>>> e7f21374dfda5eb15425dc56566d22073f5d7677
   timeout: 5000 // request timeout
 })
 

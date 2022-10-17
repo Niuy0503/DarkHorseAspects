@@ -1,6 +1,6 @@
 <template>
   <div class="add-form">
-    <el-dialog :title="text+pageTitle" :visible.sync="dialogFormVisible">
+    <el-dialog :title="text" :visible.sync="dialogFormVisible" @close="handleClose">
     <el-form :rules="ruleInline" ref="formMenu" :model="formMenu" label-position="left" label-width="120px" style='width: 400px; margin-left:120px;'>
           <el-form-item :label="$t('table.permissionUser')">
               <el-radio-group v-model="type" class="choose-type" @change="handleChooseType">
@@ -43,12 +43,20 @@
 </template>
 <script>
 import { list, detail, update, add } from '@/api/base/menus'
-import Utils from '@/components/TreeTable/utils/dataTranslate.js'
+// import Utils from '@/components/TreeTable/utils/dataTranslate.js'
 let _this = []
 export default {
   name: 'items',
   // props: ['text', 'pageTitle', 'PermissionGroupsList',],
   props: {
+    PointDataList: {
+      type: Array,
+      required: true
+    },
+    Visible: {
+      type: Boolean,
+      required: false
+    },
     treeStructure: {
       type: Boolean,
       default: function () {
@@ -57,9 +65,6 @@ export default {
     },
     // 这个是是否展示操作列
     text: {
-      type: String
-    },
-    pageTitle: {
       type: String
     },
     PermissionGroupsList: {
@@ -192,13 +197,16 @@ export default {
     },
     // 退出
     handleClose () {
-      this.$emit('handleCloseModal')
+      this.dialogFormH()
+      this.$refs.formMenu.resetFields()
     },
     // 菜单和权限点选择：编辑
     handle_Edit (object) {
       update(this.formMenu).then(() => {
         this.$emit('handleCloseModal')
         this.$emit('newDataes', this.formMenu)
+        this.handleClose()
+        this.handleResetForm()
       })
     },
     // 菜单和权限点选择：添加
@@ -208,6 +216,8 @@ export default {
         // _this.type = 'menu'
         this.$emit('handleCloseModal')
         this.$emit('newDataes', this.formMenu)
+        this.$message.success('添加成功')
+        this.handleClose()
       })
     },
     handle_Add (object) {
@@ -436,8 +446,3 @@ export default {
   }
 }
 </style>
-
-作者：CRPER
-链接：https://juejin.im/post/5972ea2f6fb9a06bc569204f
-来源：掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
